@@ -43,7 +43,9 @@ def fn_read_Excel(fileName):
     df_SCountries.set_index('Country Name')
     
     df_Transpose=df_SCountries.transpose()
-    
+    df_Transpose.rename(columns={'Country Name':'Year'},inplace=True)
+    # df_Transpose.set_index('Year')
+    print(df_Transpose.index)
     return df_SCountries,df_Transpose     
 
 def BarPlot(df,xlbl='',ylbl='',title='',filename=''):
@@ -78,7 +80,7 @@ def BarPlot(df,xlbl='',ylbl='',title='',filename=''):
     plt.savefig(filepath+filename+".png",bbox_inches = "tight",dpi=100)
     plt.show()
 
-def LinePlot(df):
+def LinePlot(df,xlbl='',ylbl='',title='',filename=''):
     """   
 
     Parameters
@@ -91,18 +93,44 @@ def LinePlot(df):
     None.
 
     """
+    filepath='C:\\Divya UH Academics\\Divya Canvas\\ADS\\Assignments\\April 2nd- Assignment 2\\'
+    lst_years=['1990','1995','2000','2005','2010','2015']
+    lst_Rqurd_Colms = ['Country Name','1990','1995','2000','2005','2010','2015']
+    df_selected = df[df.columns[df.columns.isin(lst_Rqurd_Colms)]]
+    df_melt=pd.melt(df_selected,id_vars=['Country Name'],var_name=['Year']
+            ,value_name='Value')
+    df_plot = df_melt.pivot(index='Year',columns='Country Name',values='Value')
+       
+    # #plot line graph,
+    df_plot.plot(kind='line',title=title,xlabel=xlbl,ylabel=ylbl)
+    plt.savefig(filepath+filename+".png",bbox_inches = "tight",dpi=100)
+    plt.show()
 
 
 #read co2 emission data file
 filename ='API_EN.ATM.CO2E.KT_DS2_en_excel_v2_5178991.xlsx'
 filepath='C:\\Divya UH Academics\\Divya Canvas\\ADS\\Assignments\\April 2nd- Assignment 2\\'
+# file=filepath+filename
+# df_CO2_CountryWise,df_CO2_Yearwise = fn_read_Excel(file)
+# # print(df_CO2_CountryWise)
+# # print(df_CO2_Yearwise)
+# print(df_CO2_CountryWise.describe())
+
+
+# BarPlot(df_CO2_CountryWise,'Country Name','CO2 emissions (kt)','Carbon dioxide emissions Summary','co2 bar')
+
+#read Urban population (% of total population)
+# filename ='API_SP.URB.TOTL.IN.ZS_DS2_en_excel_v2_5178990.xlsx'
+# file=filepath+filename
+# df_UrbanPop_CountryWise,df_UrbanPop_Yearwise = fn_read_Excel(file)
+
+# LinePlot(df_UrbanPop_CountryWise,'Year','Urban population (% of total population)','Urban population Summary','UrbanPOp bar')
+
+#Agriculture land
+filename ='API_AG.LND.AGRI.ZS_DS2_en_excel_v2_5172055.xlsx'
 file=filepath+filename
-df_CO2_CountryWise,df_CO2_Yearwise = fn_read_Excel(file)
-# print(df_CO2_CountryWise)
-# print(df_CO2_Yearwise)
-print(df_CO2_CountryWise.describe())
+df_Agri_CountryWise,df_Agri_Yearwise = fn_read_Excel(file)
 
-BarPlot(df_CO2_CountryWise,'Country Name','CO2 emissions (kt)','Carbon dioxide emissions Summary','co2 bar')
-
+LinePlot(df_Agri_CountryWise,'Year','Urban population (% of total population)','Urban population Summary','Agri bar')
    
     
