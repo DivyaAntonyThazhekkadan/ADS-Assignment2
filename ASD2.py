@@ -80,7 +80,7 @@ def BarPlot(df,xlbl='',ylbl='',title='',filename='',color='vlag'):
     cmap = mcolors.LinearSegmentedColormap.from_list('my_colormap', palette)
     #plot bar graph,
     df_plot.plot(kind='bar',title=title,xlabel=xlbl,ylabel=ylbl,colormap=cmap,width=0.8)
-    plt.savefig(filepath+filename+".png",bbox_inches = "tight",dpi=100)
+    plt.savefig(filepath+filename+".png",bbox_inches = "tight",dpi=100, facecolor='w')
     plt.show()
 
 def LinePlot(df,xlbl='',ylbl='',title='',filename=''):
@@ -107,7 +107,7 @@ def LinePlot(df,xlbl='',ylbl='',title='',filename=''):
     # #plot line graph,
     ax=df_plot.plot(kind='line',title=title,xlabel=xlbl,ylabel=ylbl)
     ax.legend(bbox_to_anchor=(1.5,1),loc='upper right')
-    plt.savefig(filepath+filename+".png",bbox_inches = "tight",dpi=100)
+    plt.savefig(filepath+filename+".png",bbox_inches = "tight",dpi=100, facecolor='w')
     plt.show()
 
 def statsDescribe(df,mode =0):
@@ -218,7 +218,7 @@ def HeatMap(filename,country):
         for j in range(len(df.columns)):
             text = ax.text(j,i,round(pear_corr.to_numpy()[i,j],2)
                            ,ha="center",va="center",color="black")
-    plt.savefig(filepath+' '+country+" heatmap.png",bbox_inches = "tight")
+    plt.savefig(filepath+' '+country+" heatmap.png",bbox_inches = "tight", facecolor='w')
     plt.show()       
     
     return
