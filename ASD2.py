@@ -10,6 +10,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import matplotlib.colors as mcolors
+from scipy import stats
 
 def fn_read_Excel(fileName):
     """
@@ -42,12 +43,13 @@ def fn_read_Excel(fileName):
     #remove columns with no data
     df_SCountries.dropna(axis=1,how='all', thresh=None, subset=None, \
                           inplace=True)
+    
     df_SCountries.set_index('Country Name')
     
     df_Transpose=df_SCountries.transpose()
     df_Transpose.rename(columns={'Country Name':'Year'},inplace=True)
     # df_Transpose.set_index('Year')
-    print(df_Transpose.index)
+    # print(df_Transpose.index)
     return df_SCountries,df_Transpose     
 
 def BarPlot(df,xlbl='',ylbl='',title='',filename='',color='vlag'):
@@ -78,14 +80,6 @@ def BarPlot(df,xlbl='',ylbl='',title='',filename='',color='vlag'):
     cmap = mcolors.LinearSegmentedColormap.from_list('my_colormap', palette)
     #plot bar graph,
     df_plot.plot(kind='bar',title=title,xlabel=xlbl,ylabel=ylbl,colormap=cmap,width=0.8)
-    # if(xlbl!=''):
-    #     plt.xlabel(xlabel=xlbl,fontsize=20)
-    # if(ylbl!=''):
-    #     plt.ylabel(ylabel=ylbl,fontsize=20)
-    # plt.title(title,fontsize=20)
-    
-    # plt.legend(fontsize='10',loc='upper right')
-    # plt.xticks(rotation=90)
     plt.savefig(filepath+filename+".png",bbox_inches = "tight",dpi=100)
     plt.show()
 
@@ -116,7 +110,119 @@ def LinePlot(df,xlbl='',ylbl='',title='',filename=''):
     plt.savefig(filepath+filename+".png",bbox_inches = "tight",dpi=100)
     plt.show()
 
+def statsDescribe(df,mode =0):
+    """
+    
 
+    Parameters
+    ----------
+    df : TYPE -dataframe, mode = 0-countrywise ,1- yearwise
+        DESCRIPTION.
+
+    Returns ;
+    -------
+    None.
+
+    """
+    lst_Rqurd_Colms = ['Country Name','1990','1995','2000','2005','2010','2015']
+    if mode == 0 :
+        lst_Rqurd_Colms = ['Country Name','1990','1995','2000','2005','2010','2015']
+    else:
+        lst_Rqurd_Colms = ['1990','1995','2000','2005','2010','2015']
+        
+    df_stats=df[df.columns[df.columns.isin(lst_Rqurd_Colms)]]
+    df_stats['Country Name'] = pd.to_numeric(df['Country Name'], errors='coerce')
+    
+    print("Describe")
+    print(stats.describe(df_stats))
+    print("Median ")
+    print(df_stats.median())
+    print("Mode ")
+    print(df_stats.mode())
+    
+    return 
+# def PiPlot(country='Country Name'):
+#     """   
+
+#     Parameters
+#     ----------
+#     'Country Name' : TYPE
+#         DESCRIPTION.
+
+#     Returns
+#     -------
+#     None.
+
+#     """
+#     lst_indicators=['Population growth (annual %)'
+#                     ,'Urban population (% of total population)'
+#                     ,'CO2 emissions (kt)'
+#                     ,'Energy use (kg of oil equivalent per capita)'
+#                     ,'Forest area (% of land area)'
+#                     ,'Agricultural land (% of land area)'
+#                     ,'Droughts, floods, extreme temperatures (% of population, average 1990-2009)'
+#                     ,'Total greenhouse gas emissions (% change from 1990)']
+    
+#     filename ='API_All.xlsx'
+#     filepath='C:\\Divya UH Academics\\Divya Canvas\\ADS\\Assignments\\April 2nd- Assignment 2\\'
+#     file=filepath+filename
+#     df = pd.read_excel(file)
+#     df_country=df.loc[df['Country Name']==country]
+#     df_selected=df_country.loc[df['Indicator Name'].isin(lst_indicators)]
+#     # print(df_selected)
+#     df_selected.drop(labels='Country Code',axis=1,inplace=True)
+#     # df_selected.drop(labels='Indicator Name',axis=1,inplace=True)
+#     # df_selected.drop(labels='Indicator Code',axis=1,inplace=True)
+    
+#     lst_Rqurd_Colms = ['Indicator Name','1990','1995','2000','2005','2010','2015']#,
+#     df_rqrd = df_selected[df_selected.columns[df_selected.columns.isin(lst_Rqurd_Colms)]]
+#     # df_melt=pd.melt(df_rqrd,id_vars=['Indicator Name'],var_name=['Year']
+#     #         ,value_name='Value')
+#     # df_melt.drop(labels='Year',axis=1,inplace=True)
+   
+#     df_t=df_rqrd.transpose()
+#     cor=df_t.corr()
+#     sns.heatmap(data=cor,annot=True)
+    
+#     return
+
+def HeatMap(filename,country):
+    """
+    
+
+    Parameters
+    ----------
+    filename : TYPE
+        DESCRIPTION.
+    country : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    """
+    filepath='C:\\Divya UH Academics\\Divya Canvas\\ADS\\Assignments\\April 2nd- Assignment 2\\'
+    file = filepath+filename
+    df=pd.read_excel(file)
+    pear_corr = df.corr(method='pearson')
+    fig,ax = plt.subplots(figsize=(6,6))
+    im=ax.imshow(pear_corr,interpolation='nearest')
+    fig.colorbar(im,orientation='vertical',fraction = 0.05)
+    ax.set_xticks([0,1,2,3,4,5,6])
+    ax.set_xticklabels(df.columns,rotation=90,fontsize=15)
+    ax.set_yticks([0,1,2,3,4,5,6])
+    ax.set_yticklabels(df.columns,rotation=0,fontsize=15)
+    
+    for i in range(len(df.columns)):
+        for j in range(len(df.columns)):
+            text = ax.text(j,i,round(pear_corr.to_numpy()[i,j],2)
+                           ,ha="center",va="center",color="green")
+    plt.savefig(filepath+' '+country+" heatmap.png",bbox_inches = "tight")
+    plt.show()       
+    
+    return
+    
 #read co2 emission data file
 filename ='API_EN.ATM.CO2E.KT_DS2_en_excel_v2_5178991.xlsx'
 filepath='C:\\Divya UH Academics\\Divya Canvas\\ADS\\Assignments\\April 2nd- Assignment 2\\'
@@ -124,8 +230,12 @@ file=filepath+filename
 df_CO2_CountryWise,df_CO2_Yearwise = fn_read_Excel(file)
 # print(df_CO2_CountryWise)
 # print(df_CO2_Yearwise)
+print("Describe CO2 \n")
 print(df_CO2_CountryWise.describe())
 
+
+print("Stastical properties of CO2 emission ")
+statsDescribe(df_CO2_CountryWise)
 
 BarPlot(df_CO2_CountryWise,'Country Name','CO2 emissions (kt)'
         ,'Carbon dioxide emissions Summary','co2 bar'
@@ -138,10 +248,14 @@ file=filepath+filename
 df_EnergyUse_CountryWise,df_EnergyUse_Yearwise = fn_read_Excel(file)
 
 
-BarPlot(df_EnergyUse_CountryWise,'Country Name','Energy use (kg of oil equivalent per capita)'
-        ,'Energy use (kg of oil equivalent per capita) Summary','Energy Usage bar'
-        ,color='coolwarm')
+BarPlot(df_EnergyUse_CountryWise,'Country Name'
+        ,'Energy use (kg of oil equivalent per capita)'
+        ,'Energy use (kg of oil equivalent per capita) Summary'
+        ,'Energy Usage bar'
+        ,color='Spectral')
 
+print("Stastical properties of Energy Use ")
+statsDescribe(df_EnergyUse_CountryWise)
 
 
 #read Urban population (% of total population)
@@ -150,14 +264,34 @@ file=filepath+filename
 df_UrbanPop_CountryWise,df_UrbanPop_Yearwise = fn_read_Excel(file)
 
 LinePlot(df_UrbanPop_CountryWise,'Year','Urban population (% of total population)'
-        ,'Urban population Summary','UrbanPOp bar'
-        ,color=['green', 'yellow','orange','maroon','blue','pink'])
+        ,'Urban population Summary','UrbanPOp line')
+
+
+print("Describe Urban population \n")
+print(df_UrbanPop_CountryWise.describe())
+
+
+print("Stastical properties of Urban population ")
+statsDescribe(df_UrbanPop_CountryWise)
 
 #Agriculture land
 filename ='API_AG.LND.AGRI.ZS_DS2_en_excel_v2_5172055.xlsx'
 file=filepath+filename
 df_Agri_CountryWise,df_Agri_Yearwise = fn_read_Excel(file)
 
-LinePlot(df_Agri_CountryWise,'Year','Agricultural land (% of land area)','Agricultural land Summary','Agri line')
-   
+LinePlot(df_Agri_CountryWise,'Year','Agricultural land (% of land area)'
+         ,'Agricultural land Summary','Agri line')
+
+
+print("Describe Agricultural land \n")
+print(df_Agri_CountryWise.describe())
+
+
+print("Stastical properties of Agricultural land ")
+statsDescribe(df_Agri_CountryWise)
+
+#heatmap of India
+# PiPlot('India')
+HeatMap(filename = 'India Heatmap Indicators.xlsx', country= 'India')
+
     
