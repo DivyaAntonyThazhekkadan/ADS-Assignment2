@@ -217,7 +217,7 @@ def HeatMap(filename,country):
     for i in range(len(df.columns)):
         for j in range(len(df.columns)):
             text = ax.text(j,i,round(pear_corr.to_numpy()[i,j],2)
-                           ,ha="center",va="center",color="green")
+                           ,ha="center",va="center",color="black")
     plt.savefig(filepath+' '+country+" heatmap.png",bbox_inches = "tight")
     plt.show()       
     
@@ -293,5 +293,6 @@ statsDescribe(df_Agri_CountryWise)
 #heatmap of India
 # PiPlot('India')
 HeatMap(filename = 'India Heatmap Indicators.xlsx', country= 'India')
+HeatMap(filename = 'China Heatmap Indicators.xlsx', country= 'China')
 
     
